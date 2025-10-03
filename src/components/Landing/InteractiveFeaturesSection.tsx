@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Coins, Zap, MessageSquare, BarChart3, Shield, ChevronRight, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Feature {
   id: string;
@@ -16,6 +18,8 @@ interface Feature {
 
 export const InteractiveFeaturesSection = () => {
   const [activeFeature, setActiveFeature] = useState<string>('ai-valuation');
+  const [isRunningDemo, setIsRunningDemo] = useState(false);
+  const navigate = useNavigate();
 
   const features: Feature[] = [
     {
@@ -58,6 +62,24 @@ export const InteractiveFeaturesSection = () => {
 
   const activeFeatureData = features.find(f => f.id === activeFeature) || features[0];
 
+  const handleTryDemo = () => {
+    setIsRunningDemo(true);
+    toast.success(`Running ${activeFeatureData.title} demo...`);
+    
+    setTimeout(() => {
+      setIsRunningDemo(false);
+      toast.success('Demo completed! Redirecting to dashboard...');
+      setTimeout(() => navigate('/dashboard'), 1000);
+    }, 2000);
+  };
+
+  const handleLearnMore = () => {
+    const section = activeFeature === 'ai-valuation' ? 'valuation' : 
+                   activeFeature === 'fractionalize' ? 'fractional' :
+                   activeFeature === 'instant-pages' ? 'pages' : 'messaging';
+    navigate(`/help#${section}`);
+  };
+
   return (
     <section id="features" className="py-24 bg-gradient-to-b from-slate-950 to-slate-900">
       <div className="container mx-auto px-4">
@@ -76,8 +98,8 @@ export const InteractiveFeaturesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-7xl mx-auto">
-          {/* Feature Selector */}
-          <div className="space-y-4">
+          {/* Feature Selector - Mobile optimized */}
+          <div className="space-y-3 md:space-y-4">
             {features.map((feature) => (
               <Card
                 key={feature.id}
@@ -87,8 +109,12 @@ export const InteractiveFeaturesSection = () => {
                     : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/80 hover:border-slate-600'
                 }`}
                 onClick={() => setActiveFeature(feature.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setActiveFeature(feature.id)}
+                aria-label={`Select ${feature.title} feature`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl ${
                       activeFeature === feature.id
@@ -98,13 +124,13 @@ export const InteractiveFeaturesSection = () => {
                       {feature.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                      <h3 className="text-lg md:text-xl font-bold text-white mb-2 flex items-center gap-2">
                         {feature.title}
                         {activeFeature === feature.id && (
-                          <ChevronRight className="h-5 w-5 text-cyan-400 animate-pulse" />
+                          <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-cyan-400 animate-pulse" />
                         )}
                       </h3>
-                      <p className="text-slate-400 leading-relaxed mb-3">
+                      <p className="text-sm md:text-base text-slate-400 leading-relaxed mb-3">
                         {feature.description}
                       </p>
                       <Badge variant="outline" className={`${
@@ -157,15 +183,20 @@ export const InteractiveFeaturesSection = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    className={`flex-1 bg-gradient-to-r from-${activeFeatureData.color}-500 to-${activeFeatureData.color}-600 hover:from-${activeFeatureData.color}-600 hover:to-${activeFeatureData.color}-700 text-white font-semibold transition-all duration-200`}
+                    className={`flex-1 bg-gradient-to-r from-${activeFeatureData.color}-500 to-${activeFeatureData.color}-600 hover:from-${activeFeatureData.color}-600 hover:to-${activeFeatureData.color}-700 text-white font-semibold transition-all duration-200 min-h-[44px]`}
+                    onClick={handleTryDemo}
+                    disabled={isRunningDemo}
+                    aria-label={`Try ${activeFeatureData.title} live demo`}
                   >
-                    Try Live Demo
+                    {isRunningDemo ? 'Running...' : 'Try Live Demo'}
                   </Button>
                   <Button 
                     variant="outline"
-                    className="border-slate-600 hover:border-slate-500 text-slate-300"
+                    className="border-slate-600 hover:border-slate-500 text-slate-300 min-h-[44px]"
+                    onClick={handleLearnMore}
+                    aria-label={`Learn more about ${activeFeatureData.title}`}
                   >
                     Learn More
                   </Button>

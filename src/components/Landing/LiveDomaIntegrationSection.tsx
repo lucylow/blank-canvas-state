@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Activity, TrendingUp, Coins, ExternalLink, Sparkles, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const LiveDomaIntegrationSection = () => {
+  const navigate = useNavigate();
+  const [expandedTx, setExpandedTx] = useState<number | null>(null);
+  
   // Mock live data - In production, fetch from Doma testnet subgraph
   const liveStats = {
     totalVolume: '$125,430',
@@ -24,6 +29,16 @@ export const LiveDomaIntegrationSection = () => {
     { name: 'blockchain-pro.com', price: '2.8 ETH', offers: 1, views: 89 },
     { name: 'meta-space.xyz', price: '1.5 ETH', offers: 5, views: 203 }
   ];
+
+  const handleViewAllListings = () => {
+    toast.success('Navigating to marketplace...');
+    navigate('/marketplace');
+  };
+
+  const handleViewDetails = (domain: string) => {
+    toast.success(`Loading details for ${domain}...`);
+    navigate('/marketplace');
+  };
 
   return (
     <section id="live-integration" className="py-24 bg-gradient-to-b from-slate-900 to-slate-950 relative overflow-hidden">
@@ -48,45 +63,45 @@ export const LiveDomaIntegrationSection = () => {
           </p>
         </div>
 
-        {/* Live Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 animate-slide-up">
-          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-green-500/50 transition-all duration-300 group">
-            <CardContent className="p-6 text-center">
-              <div className="mb-3">
-                <TrendingUp className="h-8 w-8 text-green-400 mx-auto group-hover:scale-110 transition-transform" />
+        {/* Live Stats Grid - Mobile responsive */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12 animate-slide-up">
+          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-green-500/50 transition-all duration-300 group cursor-pointer">
+            <CardContent className="p-4 md:p-6 text-center">
+              <div className="mb-2 md:mb-3">
+                <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-green-400 mx-auto group-hover:scale-110 transition-transform" />
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{liveStats.totalVolume}</div>
-              <div className="text-sm text-slate-400">Total Volume Locked</div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">{liveStats.totalVolume}</div>
+              <div className="text-xs md:text-sm text-slate-400">Total Volume Locked</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-purple-500/50 transition-all duration-300 group">
-            <CardContent className="p-6 text-center">
-              <div className="mb-3">
-                <Coins className="h-8 w-8 text-purple-400 mx-auto group-hover:scale-110 transition-transform" />
+          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer">
+            <CardContent className="p-4 md:p-6 text-center">
+              <div className="mb-2 md:mb-3">
+                <Coins className="h-6 w-6 md:h-8 md:w-8 text-purple-400 mx-auto group-hover:scale-110 transition-transform" />
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{liveStats.fractionalized}</div>
-              <div className="text-sm text-slate-400">Domains Fractionalized</div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">{liveStats.fractionalized}</div>
+              <div className="text-xs md:text-sm text-slate-400">Domains Fractionalized</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-cyan-500/50 transition-all duration-300 group">
-            <CardContent className="p-6 text-center">
-              <div className="mb-3">
-                <Activity className="h-8 w-8 text-cyan-400 mx-auto group-hover:scale-110 transition-transform animate-pulse" />
+          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-cyan-500/50 transition-all duration-300 group cursor-pointer">
+            <CardContent className="p-4 md:p-6 text-center">
+              <div className="mb-2 md:mb-3">
+                <Activity className="h-6 w-6 md:h-8 md:w-8 text-cyan-400 mx-auto group-hover:scale-110 transition-transform animate-pulse" />
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{liveStats.activeUsers}</div>
-              <div className="text-sm text-slate-400">Active Right Now</div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">{liveStats.activeUsers}</div>
+              <div className="text-xs md:text-sm text-slate-400">Active Right Now</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-pink-500/50 transition-all duration-300 group">
-            <CardContent className="p-6 text-center">
-              <div className="mb-3">
-                <Zap className="h-8 w-8 text-pink-400 mx-auto group-hover:scale-110 transition-transform" />
+          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 hover:border-pink-500/50 transition-all duration-300 group cursor-pointer">
+            <CardContent className="p-4 md:p-6 text-center">
+              <div className="mb-2 md:mb-3">
+                <Zap className="h-6 w-6 md:h-8 md:w-8 text-pink-400 mx-auto group-hover:scale-110 transition-transform" />
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{liveStats.avgDealTime}</div>
-              <div className="text-sm text-slate-400">Avg Deal Time</div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">{liveStats.avgDealTime}</div>
+              <div className="text-xs md:text-sm text-slate-400">Avg Deal Time</div>
             </CardContent>
           </Card>
         </div>
@@ -134,8 +149,9 @@ export const LiveDomaIntegrationSection = () => {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="ml-2 p-2 hover:bg-slate-800"
+                      className="ml-2 p-2 hover:bg-slate-800 min-w-[44px] min-h-[44px]"
                       onClick={() => window.open(`https://etherscan.io/tx/${tx.tx}`, '_blank')}
+                      aria-label={`View transaction ${tx.tx} on Etherscan`}
                     >
                       <ExternalLink className="h-4 w-4 text-slate-400 hover:text-cyan-400" />
                     </Button>
@@ -192,7 +208,9 @@ export const LiveDomaIntegrationSection = () => {
                       </Badge>
                       <Button
                         size="sm"
-                        className="ml-auto bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-500/50"
+                        className="ml-auto bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-500/50 min-h-[44px]"
+                        onClick={() => handleViewDetails(listing.name)}
+                        aria-label={`View details for ${listing.name}`}
                       >
                         View Details
                       </Button>
@@ -202,7 +220,9 @@ export const LiveDomaIntegrationSection = () => {
               </div>
 
               <Button 
-                className="w-full mt-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                className="w-full mt-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold min-h-[44px]"
+                onClick={handleViewAllListings}
+                aria-label="Explore all domain listings in marketplace"
               >
                 Explore All Listings
               </Button>
