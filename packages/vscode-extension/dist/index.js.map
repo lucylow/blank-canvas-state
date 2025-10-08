@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/index.ts"],"sourcesContent":["// This is a stub of a VS Code extension main entry\nexport function activate(context) {\n  console.log('CompatGuard VS Code extension (stub) activated.');\n}\nexport function deactivate() {}\n"],"mappings":";AACO,SAAS,SAAS,SAAS;AAChC,UAAQ,IAAI,iDAAiD;AAC/D;AACO,SAAS,aAAa;AAAC;","names":[]}
