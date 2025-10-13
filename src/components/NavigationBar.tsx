@@ -13,7 +13,11 @@ import {
   Sparkles,
   Code,
   Home,
-  ChevronDown
+  ChevronDown,
+  Store,
+  Repeat,
+  Wallet,
+  TrendingUp
 } from "lucide-react";
 import { useState } from 'react';
 import WalletConnect from './WalletConnect';
@@ -82,6 +86,33 @@ const NavigationBar = () => {
       path: '/api-demo', 
       icon: <Code className="w-4 h-4" />,
       description: 'Live API integration'
+    },
+  ];
+
+  const defiNavItems: NavItem[] = [
+    { 
+      label: 'NFT Marketplace', 
+      path: '/nft-marketplace', 
+      icon: <Store className="w-4 h-4" />,
+      description: 'Trade invoice NFTs'
+    },
+    { 
+      label: 'Cross-Chain Swap', 
+      path: '/cross-chain-swap', 
+      icon: <Repeat className="w-4 h-4" />,
+      description: 'Multi-chain swaps'
+    },
+    { 
+      label: 'Treasury', 
+      path: '/treasury', 
+      icon: <Wallet className="w-4 h-4" />,
+      description: 'Multisig treasury'
+    },
+    { 
+      label: 'Yield Optimizer', 
+      path: '/yield-optimizer', 
+      icon: <TrendingUp className="w-4 h-4" />,
+      description: 'Optimize yields'
     },
   ];
 
@@ -163,6 +194,37 @@ const NavigationBar = () => {
                   onMouseLeave={() => setIsDemoMenuOpen(false)}
                 >
                   {demoNavItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
+                        isActive(item.path) ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                      }`}
+                    >
+                      {item.icon}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">{item.label}</span>
+                          {item.badge && (
+                            <Badge variant="secondary" className="text-xs">
+                              {item.badge}
+                            </Badge>
+                          )}
+                        </div>
+                        {item.description && (
+                          <span className="text-xs text-gray-500">{item.description}</span>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                  
+                  <div className="my-2 border-t border-gray-100"></div>
+                  
+                  <div className="px-4 py-1">
+                    <span className="text-xs font-semibold text-gray-400 uppercase">DeFi Features</span>
+                  </div>
+                  
+                  {defiNavItems.map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
@@ -278,6 +340,40 @@ const NavigationBar = () => {
                       {item.label}
                       {item.badge && (
                         <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    {item.description && (
+                      <span className="text-xs text-gray-500">{item.description}</span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+
+              {/* DeFi Section */}
+              <div className="pt-2 pb-1 px-3">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  DeFi Features
+                </span>
+              </div>
+              {defiNavItems.map((item) => (
+                <Link 
+                  key={item.path}
+                  to={item.path} 
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    isActive(item.path) 
+                      ? 'bg-blue-50 text-blue-600 font-semibold' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.icon}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      {item.label}
+                      {item.badge && (
+                        <Badge variant="secondary" className="text-xs">
                           {item.badge}
                         </Badge>
                       )}

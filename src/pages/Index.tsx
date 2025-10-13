@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useWalletStore } from "@/store/useWalletStore";
 import { useCryptoPrices } from "@/hooks/useCryptoPrices";
 import QuickNav from "@/components/QuickNav";
+import NavigationBar from "@/components/NavigationBar";
 
 // Utility function for formatting currency
 const formatCurrency = (amount: number, currency = 'USD') => {
@@ -22,6 +23,7 @@ const Index: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-background">
+      <NavigationBar />
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="mb-12 text-center">

@@ -2,10 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText, Wallet, GitBranch, Shield, TrendingUp, Clock, DollarSign } from "lucide-react";
+import NavigationBar from "@/components/NavigationBar";
 
 const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <NavigationBar />
       <div className="container mx-auto px-4 py-8">
         <header className="mb-12">
           <h1 className="text-4xl font-bold mb-2 text-gray-900">
