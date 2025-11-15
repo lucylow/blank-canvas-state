@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Brain, Zap, Leaf, Box } from 'lucide-react';
+import { ArrowLeft, Brain, Zap, Leaf, Box, Building, Swords, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Minimap } from '@/components/game/Minimap';
+import { BuildQueue } from '@/components/game/BuildQueue';
+import { TechTreeModal } from '@/components/game/TechTreeModal';
+import { BuildMenu } from '@/components/game/BuildMenu';
+import { COMMANDERS, AI_SUGGESTIONS, BUILDINGS, TECH_TREE } from '@/data/gameData';
+import { toast } from 'sonner';
 
 interface GameResources {
   ore: number;
@@ -27,6 +33,10 @@ const Game = () => {
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const [showTechTree, setShowTechTree] = useState(false);
   const [showCommanders, setShowCommanders] = useState(false);
+  const [showBuildMenu, setShowBuildMenu] = useState(false);
+  const [buildQueue, setBuildQueue] = useState<any[]>([]);
+  const [researchedTechs, setResearchedTechs] = useState<Set<string>>(new Set());
+  const [aiMessages, setAiMessages] = useState<Array<{ commander: string; message: string; id: number }>>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -246,6 +256,7 @@ const Game = () => {
       // Keyboard shortcuts
       this.input.keyboard?.on('keydown-T', () => setShowTechTree(true));
       this.input.keyboard?.on('keydown-C', () => setShowCommanders(true));
+      this.input.keyboard?.on('keydown-B', () => setShowBuildMenu(true));
       this.input.keyboard?.on('keydown-S', () => {
         selectedUnits.forEach(unit => unit.setVelocity(0, 0));
       });
@@ -293,6 +304,21 @@ const Game = () => {
         callback: () => setGameTime(prev => prev + 1),
         loop: true
       });
+
+      // AI suggestions
+      this.time.addEvent({
+        delay: 30000,
+        callback: () => {
+          const suggestion = AI_SUGGESTIONS[Math.floor(Math.random() * AI_SUGGESTIONS.length)];
+          const id = Date.now();
+          setAiMessages(prev => [...prev, { ...suggestion, id }]);
+          toast.info(`${suggestion.commander}: ${suggestion.message}`);
+          setTimeout(() => {
+            setAiMessages(prev => prev.filter(msg => msg.id !== id));
+          }, 10000);
+        },
+        loop: true
+      });
     }
 
     function update(this: Phaser.Scene) {
@@ -320,18 +346,96 @@ const Game = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleBuild = (buildingId: string) => {
+    const building = BUILDINGS[buildingId];
+    if (!building) return;
+
+    if (
+      (!building.cost.ore || resources.ore >= building.cost.ore) &&
+      (!building.cost.energy || resources.energy >= building.cost.energy) &&
+      (!building.cost.biomass || resources.biomass >= building.cost.biomass) &&
+      (!building.cost.data || resources.data >= building.cost.data)
+    ) {
+      setResources(prev => ({
+        ore: prev.ore - (building.cost.ore || 0),
+        energy: prev.energy - (building.cost.energy || 0),
+        biomass: prev.biomass - (building.cost.biomass || 0),
+        data: prev.data - (building.cost.data || 0)
+      }));
+
+      setBuildQueue(prev => [...prev, {
+        id: Date.now().toString(),
+        name: building.name,
+        timeRemaining: building.buildTime,
+        totalTime: building.buildTime
+      }]);
+
+      toast.success(`${building.name} construction started`);
+      setShowBuildMenu(false);
+    } else {
+      toast.error('Insufficient resources');
+    }
+  };
+
+  const handleBuildComplete = (id: string) => {
+    const item = buildQueue.find(q => q.id === id);
+    if (item) {
+      const building = Object.values(BUILDINGS).find(b => b.name === item.name);
+      if (building?.produces) {
+        toast.success(`${item.name} completed! Now producing resources.`);
+      } else {
+        toast.success(`${item.name} construction complete!`);
+      }
+    }
+  };
+
+  const handleResearch = (techId: string) => {
+    const tech = TECH_TREE[techId];
+    if (!tech) return;
+
+    if (
+      (!tech.cost.ore || resources.ore >= tech.cost.ore) &&
+      (!tech.cost.energy || resources.energy >= tech.cost.energy) &&
+      (!tech.cost.biomass || resources.biomass >= tech.cost.biomass) &&
+      (!tech.cost.data || resources.data >= tech.cost.data)
+    ) {
+      setResources(prev => ({
+        ore: prev.ore - (tech.cost.ore || 0),
+        energy: prev.energy - (tech.cost.energy || 0),
+        biomass: prev.biomass - (tech.cost.biomass || 0),
+        data: prev.data - (tech.cost.data || 0)
+      }));
+
+      setTimeout(() => {
+        setResearchedTechs(prev => new Set([...prev, techId]));
+        toast.success(`Research complete: ${tech.name}! ${tech.effects}`);
+      }, tech.researchTime * 1000);
+
+      toast.info(`Researching ${tech.name}... (${tech.researchTime}s)`);
+    } else {
+      toast.error('Insufficient resources for research');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-quaternion-darker to-quaternion-dark text-quaternion-light overflow-hidden">
       <header className="fixed top-0 left-0 right-0 z-50 bg-quaternion-darker/90 backdrop-blur-md border-b border-quaternion-primary">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Button variant="ghost" onClick={() => navigate('/')} className="text-quaternion-primary hover:text-quaternion-secondary">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
           <h1 className="text-xl font-bold text-quaternion-primary">QUATERNION: NEURAL FRONTIER</h1>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowTechTree(true)}>Tech Tree</Button>
-            <Button variant="outline" size="sm" onClick={() => setShowCommanders(true)}>Commanders</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowBuildMenu(true)}>
+              <Building className="mr-1 h-3 w-3" /> Build
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowTechTree(true)}>
+              <Brain className="mr-1 h-3 w-3" /> Tech
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowCommanders(true)}>
+              <Swords className="mr-1 h-3 w-3" /> Commanders
+            </Button>
           </div>
         </div>
       </header>
@@ -390,6 +494,10 @@ const Game = () => {
                     <span>Population</span>
                     <span className="font-mono">{population.current}/{population.max}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Techs</span>
+                    <span className="font-mono">{researchedTechs.size}/{Object.keys(TECH_TREE).length}</span>
+                  </div>
                   {selectedUnit && (
                     <div className="pt-2 border-t border-quaternion-primary/20">
                       <span className="text-quaternion-secondary">Selected: {selectedUnit}</span>
@@ -398,53 +506,78 @@ const Game = () => {
                 </div>
               </div>
 
+              <BuildQueue queue={buildQueue} onItemComplete={handleBuildComplete} />
+
+              <Minimap 
+                gameWidth={1200 * 2}
+                gameHeight={700 * 2}
+                playerUnits={[]}
+                enemyUnits={[]}
+                buildings={[]}
+              />
+
               <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
                 <h3 className="text-quaternion-primary font-bold mb-3">Controls</h3>
                 <div className="space-y-1 text-xs">
                   <p>• Left Click: Select</p>
                   <p>• Right Click: Move</p>
                   <p>• Arrows: Camera</p>
+                  <p>• B: Build Menu</p>
                   <p>• T: Tech Tree</p>
                   <p>• C: Commanders</p>
                   <p>• S: Stop Units</p>
                 </div>
               </div>
+
+              {aiMessages.length > 0 && (
+                <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
+                  <h3 className="text-quaternion-primary font-bold mb-3 flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    AI Suggestion
+                  </h3>
+                  {aiMessages.map(msg => (
+                    <div key={msg.id} className="text-xs mb-2 last:mb-0">
+                      <span className="font-bold text-quaternion-secondary">{msg.commander}:</span>
+                      <p className="text-quaternion-light/80 mt-1">{msg.message}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {showTechTree && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowTechTree(false)}>
-          <div className="bg-quaternion-darker border-2 border-quaternion-primary rounded-lg p-6 max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
-            <h2 className="text-2xl font-bold text-quaternion-primary mb-4">QUATERNION TECH TREE</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {['Matter Core', 'Energy Reactor', 'Bio Labs', 'Data Center'].map((tech, i) => (
-                <div key={i} className="bg-quaternion-dark border border-quaternion-primary/30 rounded p-3">
-                  <h3 className="font-bold text-sm mb-1">{tech}</h3>
-                  <p className="text-xs text-quaternion-light/60">Cost: {100 + i * 50} Ore</p>
-                </div>
-              ))}
-            </div>
-            <Button onClick={() => setShowTechTree(false)} className="mt-4 w-full">Close</Button>
-          </div>
-        </div>
+        <TechTreeModal
+          researchedTechs={researchedTechs}
+          resources={resources}
+          onResearch={handleResearch}
+          onClose={() => setShowTechTree(false)}
+        />
+      )}
+
+      {showBuildMenu && (
+        <BuildMenu
+          resources={resources}
+          onBuild={handleBuild}
+          onClose={() => setShowBuildMenu(false)}
+        />
       )}
 
       {showCommanders && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowCommanders(false)}>
           <div className="bg-quaternion-darker border-2 border-quaternion-primary rounded-lg p-6 max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
             <h2 className="text-2xl font-bold text-quaternion-primary mb-4">AI COMMANDERS</h2>
-            <div className="space-y-3">
-              {[
-                { name: 'AUREN', role: 'Architect of Matter', color: 'quaternion-primary' },
-                { name: 'VIREL', role: 'Keeper of Energy', color: 'quaternion-secondary' },
-                { name: 'LIRA', role: 'Voice of Life', color: 'green-500' },
-                { name: 'KOR', role: 'Seer of Knowledge', color: 'yellow-500' }
-              ].map((cmd, i) => (
-                <div key={i} className={`bg-quaternion-dark border-l-4 border-${cmd.color} rounded p-3`}>
-                  <h3 className="font-bold">{cmd.name}</h3>
-                  <p className="text-sm text-quaternion-light/60">{cmd.role}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {COMMANDERS.map((cmd) => (
+                <div key={cmd.id} className="bg-quaternion-dark border-l-4 rounded p-4" style={{ borderColor: cmd.color }}>
+                  <h3 className="font-bold text-lg mb-1" style={{ color: cmd.color }}>{cmd.name}</h3>
+                  <p className="text-sm text-quaternion-light/60 italic mb-2">{cmd.role}</p>
+                  <p className="text-xs text-quaternion-light/80 mb-2">{cmd.focus}</p>
+                  <p className="text-xs text-quaternion-light/60 italic border-t border-quaternion-primary/20 pt-2 mt-2">
+                    "{cmd.quote}"
+                  </p>
                 </div>
               ))}
             </div>
