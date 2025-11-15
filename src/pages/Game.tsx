@@ -450,104 +450,106 @@ const Game = () => {
         </div>
       )}
 
-      <div className="pt-20 px-4">
-        <div className="container mx-auto max-w-[1400px]">
+      <div className="pt-20 px-4 pb-4">
+        <div className="container mx-auto max-w-[1600px]">
           <div className="grid grid-cols-12 gap-4">
+            {/* Main Game Area */}
             <div className="col-span-12 lg:col-span-9">
-              <div ref={gameRef} className="relative border-2 border-quaternion-primary rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,255,234,0.3)]" style={{ height: '700px' }} />
+              <div ref={gameRef} className="relative border-2 border-game-panel-border rounded-lg overflow-hidden shadow-game-panel bg-background" style={{ height: '700px' }} />
             </div>
 
+            {/* Right Sidebar */}
             <div className="col-span-12 lg:col-span-3 space-y-4">
-              <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
-                <h3 className="text-quaternion-primary font-bold mb-3 flex items-center gap-2">
+              {/* Resources Panel */}
+              <div className="bg-game-panel/90 backdrop-blur-md border border-game-panel-border/50 rounded-lg p-4 shadow-game-panel">
+                <h3 className="text-primary font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
                   <Box className="w-4 h-4" />
                   Resources
                 </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm flex items-center gap-2"><Box className="w-3 h-3 text-quaternion-primary" /> Ore</span>
-                    <span className="font-mono text-quaternion-primary">{resources.ore}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 rounded bg-background/30 hover:bg-background/50 transition-colors">
+                    <span className="text-xs flex items-center gap-2 text-foreground/70">
+                      <Box className="w-3 h-3 text-resource-ore" /> Ore
+                    </span>
+                    <span className="font-mono text-resource-ore font-bold">{resources.ore}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm flex items-center gap-2"><Zap className="w-3 h-3 text-quaternion-secondary" /> Energy</span>
-                    <span className="font-mono text-quaternion-secondary">{resources.energy}</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-background/30 hover:bg-background/50 transition-colors">
+                    <span className="text-xs flex items-center gap-2 text-foreground/70">
+                      <Zap className="w-3 h-3 text-resource-energy" /> Energy
+                    </span>
+                    <span className="font-mono text-resource-energy font-bold">{resources.energy}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm flex items-center gap-2"><Leaf className="w-3 h-3 text-green-500" /> Biomass</span>
-                    <span className="font-mono text-green-500">{resources.biomass}</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-background/30 hover:bg-background/50 transition-colors">
+                    <span className="text-xs flex items-center gap-2 text-foreground/70">
+                      <Leaf className="w-3 h-3 text-resource-biomass" /> Biomass
+                    </span>
+                    <span className="font-mono text-resource-biomass font-bold">{resources.biomass}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm flex items-center gap-2"><Brain className="w-3 h-3 text-yellow-500" /> Data</span>
-                    <span className="font-mono text-yellow-500">{resources.data}</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-background/30 hover:bg-background/50 transition-colors">
+                    <span className="text-xs flex items-center gap-2 text-foreground/70">
+                      <Brain className="w-3 h-3 text-resource-data" /> Data
+                    </span>
+                    <span className="font-mono text-resource-data font-bold">{resources.data}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
-                <h3 className="text-quaternion-primary font-bold mb-3">Game Info</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Time</span>
-                    <span className="font-mono">{formatTime(gameTime)}</span>
+              {/* Game Info Panel */}
+              <div className="bg-game-panel/90 backdrop-blur-md border border-game-panel-border/50 rounded-lg p-4 shadow-game-panel">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-foreground/70">Population</span>
+                    <span className="font-mono text-primary font-bold">{population.current}/{population.max}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Population</span>
-                    <span className="font-mono">{population.current}/{population.max}</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-foreground/70">Game Time</span>
+                    <span className="font-mono text-secondary font-bold">
+                      {Math.floor(gameTime / 60)}:{(gameTime % 60).toString().padStart(2, '0')}
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Techs</span>
-                    <span className="font-mono">{researchedTechs.size}/{Object.keys(TECH_TREE).length}</span>
-                  </div>
-                  {selectedUnit && (
-                    <div className="pt-2 border-t border-quaternion-primary/20">
-                      <span className="text-quaternion-secondary">Selected: {selectedUnit}</span>
+                </div>
+              </div>
+
+              {/* Build Queue */}
+              {buildQueue.length > 0 && (
+                <div className="bg-game-panel/90 backdrop-blur-md border border-game-panel-border/50 rounded-lg p-4 shadow-game-panel">
+                  <h3 className="text-primary font-bold mb-3 text-sm uppercase tracking-wide">Build Queue</h3>
+                  <BuildQueue queue={buildQueue} onItemComplete={handleBuildComplete} />
+                </div>
+              )}
+
+              {/* Minimap */}
+              <div className="bg-game-panel/90 backdrop-blur-md border border-game-panel-border/50 rounded-lg p-4 shadow-game-panel">
+                <h3 className="text-primary font-bold mb-3 text-sm uppercase tracking-wide">Tactical Map</h3>
+                <Minimap gameWidth={1200} gameHeight={700} playerUnits={[]} enemyUnits={[]} buildings={[]} />
+              </div>
+
+              {/* AI Suggestions */}
+              <div className="bg-game-panel/90 backdrop-blur-md border border-accent/30 rounded-lg p-4 shadow-game-panel">
+                <h3 className="text-accent font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
+                  <MessageCircle className="w-4 h-4" />
+                  AI Insights
+                </h3>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {aiMessages.slice(-3).map((msg) => (
+                    <div key={msg.id} className="text-xs p-2 rounded bg-background/30 border border-accent/20">
+                      <div className="font-bold text-accent mb-1">{msg.commander}</div>
+                      <div className="text-foreground/70">{msg.message}</div>
+                    </div>
+                  ))}
+                  {aiMessages.length === 0 && (
+                    <div className="text-xs text-muted-foreground text-center py-4">
+                      AI commanders will provide strategic insights
                     </div>
                   )}
                 </div>
               </div>
-
-              <BuildQueue queue={buildQueue} onItemComplete={handleBuildComplete} />
-
-              <Minimap 
-                gameWidth={1200 * 2}
-                gameHeight={700 * 2}
-                playerUnits={[]}
-                enemyUnits={[]}
-                buildings={[]}
-              />
-
-              <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
-                <h3 className="text-quaternion-primary font-bold mb-3">Controls</h3>
-                <div className="space-y-1 text-xs">
-                  <p>• Left Click: Select</p>
-                  <p>• Right Click: Move</p>
-                  <p>• Arrows: Camera</p>
-                  <p>• B: Build Menu</p>
-                  <p>• T: Tech Tree</p>
-                  <p>• C: Commanders</p>
-                  <p>• S: Stop Units</p>
-                </div>
-              </div>
-
-              {aiMessages.length > 0 && (
-                <div className="bg-quaternion-darker/80 backdrop-blur-sm border border-quaternion-primary/30 rounded-lg p-4">
-                  <h3 className="text-quaternion-primary font-bold mb-3 flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    AI Suggestion
-                  </h3>
-                  {aiMessages.map(msg => (
-                    <div key={msg.id} className="text-xs mb-2 last:mb-0">
-                      <span className="font-bold text-quaternion-secondary">{msg.commander}:</span>
-                      <p className="text-quaternion-light/80 mt-1">{msg.message}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Tech Tree Modal */}
       {showTechTree && (
         <TechTreeModal
           researchedTechs={researchedTechs}
@@ -557,6 +559,7 @@ const Game = () => {
         />
       )}
 
+      {/* Build Menu Modal */}
       {showBuildMenu && (
         <BuildMenu
           resources={resources}
@@ -565,23 +568,32 @@ const Game = () => {
         />
       )}
 
+      {/* Commanders Modal */}
       {showCommanders && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowCommanders(false)}>
-          <div className="bg-quaternion-darker border-2 border-quaternion-primary rounded-lg p-6 max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
-            <h2 className="text-2xl font-bold text-quaternion-primary mb-4">AI COMMANDERS</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {COMMANDERS.map((cmd) => (
-                <div key={cmd.id} className="bg-quaternion-dark border-l-4 rounded p-4" style={{ borderColor: cmd.color }}>
-                  <h3 className="font-bold text-lg mb-1" style={{ color: cmd.color }}>{cmd.name}</h3>
-                  <p className="text-sm text-quaternion-light/60 italic mb-2">{cmd.role}</p>
-                  <p className="text-xs text-quaternion-light/80 mb-2">{cmd.focus}</p>
-                  <p className="text-xs text-quaternion-light/60 italic border-t border-quaternion-primary/20 pt-2 mt-2">
-                    "{cmd.quote}"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="bg-game-panel border-2 border-game-panel-border rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto shadow-[0_0_40px_rgba(0,255,234,0.2)]">
+            <h2 className="text-2xl font-bold text-primary mb-6 uppercase tracking-wide">AI Commanders</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {COMMANDERS.map((commander) => (
+                <div
+                  key={commander.id}
+                  className="p-4 rounded-lg bg-background/50 border-2 transition-all hover:scale-105 hover:shadow-neon"
+                  style={{ borderColor: commander.color }}
+                >
+                  <h3 className="font-bold text-lg mb-2" style={{ color: commander.color }}>
+                    {commander.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-2 italic">{commander.role}</p>
+                  <p className="text-xs mb-3"><strong>Focus:</strong> {commander.focus}</p>
+                  <p className="text-xs italic border-l-2 pl-3 py-2" style={{ borderColor: commander.color }}>
+                    "{commander.quote}"
                   </p>
                 </div>
               ))}
             </div>
-            <Button onClick={() => setShowCommanders(false)} className="mt-4 w-full">Close</Button>
+            <Button onClick={() => setShowCommanders(false)} className="w-full" variant="outline">
+              Close
+            </Button>
           </div>
         </div>
       )}
