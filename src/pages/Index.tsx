@@ -1,405 +1,461 @@
-import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Wallet, Shield, Plus, TrendingUp, RefreshCw, Sparkles, Award, Coins, Brain, Zap, Users, Target } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useWalletStore } from "@/store/useWalletStore";
-import { useCryptoPrices } from "@/hooks/useCryptoPrices";
-import QuickNav from "@/components/QuickNav";
-import NavigationBar from "@/components/NavigationBar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Brain, Box, Zap, Leaf, Trophy, ChevronDown, Gamepad2, Clock, Bot, Grid3x3, Palette, Mic, Music, Mountain, GitBranch, Dices } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import heroImage from "@/assets/quaternion-hero.webp";
+import mapImage from "@/assets/game-maps.webp";
 
-// Utility function for formatting currency
-const formatCurrency = (amount: number, currency = 'USD') => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-};
+const Index = () => {
+  const navigate = useNavigate();
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
-const Index: React.FC = () => {
-  const { isConnected } = useWalletStore();
-  const { prices, loading: pricesLoading, refetch } = useCryptoPrices();
-  
+  useEffect(() => {
+    // Scroll progress bar
+    const progressBar = document.createElement('div');
+    progressBar.className = 'fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-secondary z-[100] transition-all';
+    progressBar.style.width = '0%';
+    document.body.appendChild(progressBar);
+
+    const handleScroll = () => {
+      const winHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.pageYOffset;
+      const progress = (scrollTop / (docHeight - winHeight)) * 100;
+      progressBar.style.width = `${progress}%`;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          entry.target.classList.remove('opacity-0', 'translate-y-5');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach(el => observer.observe(el));
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      progressBar.remove();
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      <NavigationBar />
-      <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <section className="mb-12 text-center">
-          <h1 className="text-5xl font-bold mb-4 text-foreground">
-            BitMindAI: Neural Network for Bitcoin's Real-World Economy
-          </h1>
-          <p className="text-muted-foreground text-xl mb-6 max-w-3xl mx-auto">
-            AI-powered invoice parsing + Clarity smart contracts + Bitcoin-native sBTC settlement
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Badge variant="secondary" className="bg-green-100 text-green-800 px-4 py-2 text-sm">
-              ✓ 95%+ AI Accuracy
-            </Badge>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800 px-4 py-2 text-sm">
-              ⚡ Sub-2s Processing
-            </Badge>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm">
-              ₿ Bitcoin-Native Settlement
-            </Badge>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Header */}
+      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-primary/30">
+        <nav className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <a href="#" className="flex items-center gap-2 text-2xl font-bold text-primary">
+              <Brain className="w-8 h-8" />
+              <span>QUATERNION<span className="text-secondary">:</span>NF</span>
+            </a>
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#overview" onClick={(e) => { e.preventDefault(); scrollToSection('overview'); }} className="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded">Overview</a>
+              <a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection('features'); }} className="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded">Features</a>
+              <a href="#ai-tools" onClick={(e) => { e.preventDefault(); scrollToSection('ai-tools'); }} className="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded">AI Tools</a>
+              <a href="#demo" onClick={(e) => { e.preventDefault(); scrollToSection('demo'); }} className="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded">Demo</a>
+              <a href="#characters" onClick={(e) => { e.preventDefault(); scrollToSection('characters'); }} className="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded">Characters</a>
+            </div>
+            <Button className="bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-neon focus:ring-2 focus:ring-primary focus:ring-offset-2">
+              Play Now
+            </Button>
           </div>
-          {isConnected && (
-            <div className="flex gap-3 justify-center mt-6">
-              <Link to="/demo">
-                <Button className="bg-gradient-to-r from-orange-500 to-purple-600">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Try AI Demo
-                </Button>
-              </Link>
-              <Link to="/create">
-                <Button variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Invoice
-                </Button>
-              </Link>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center pt-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-30" />
+        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6 z-10">
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
+              QUATERNION: NEURAL FRONTIER
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              An AI-generated strategy game where every decision rotates the four dimensions of reality. Command procedurally generated armies, exploit dynamic terrain, and balance the Quaternion to achieve victory.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Button 
+                size="lg" 
+                onClick={() => navigate('/game')}
+                className="bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-neon focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                Play Free Demo
+              </Button>
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                Watch Gameplay
+              </Button>
             </div>
-          )}
-        </section>
-
-        {/* DeFi Features Highlight - NEW! */}
-        <Card className="mb-8 bg-gradient-to-r from-purple-100 via-blue-100 to-green-100 border-purple-300">
-          <CardContent className="pt-6">
-            <div className="text-center mb-6">
-              <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 mb-3">
-                🏆 Advanced DeFi Features - Hackathon Special
-              </Badge>
-              <h2 className="text-3xl font-bold mb-2">Next-Generation DeFi Primitives</h2>
-              <p className="text-muted-foreground">
-                Unlocking liquidity, governance, and capital efficiency for Bitcoin DAOs
-              </p>
+            
+            <div className="flex flex-wrap gap-6 text-sm">
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <strong className="text-primary">15-30min</strong> Demo
+              </span>
+              <span className="flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4 text-primary" />
+                <strong className="text-primary">No Download</strong> Required
+              </span>
+              <span className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" />
+                <strong className="text-primary">Instant Play</strong>
+              </span>
             </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link to="/nft-marketplace">
-                <Card className="hover:shadow-xl transition-all cursor-pointer bg-white border-2 hover:border-purple-400">
-                  <CardContent className="pt-6 text-center">
-                    <Award className="w-12 h-12 mx-auto mb-3 text-purple-600" />
-                    <h3 className="font-bold mb-2">Invoice NFTs</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Tokenize & trade receivables for instant liquidity
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      $2.4M Volume
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </Link>
-
-              <Link to="/treasury">
-                <Card className="hover:shadow-xl transition-all cursor-pointer bg-white border-2 hover:border-blue-400">
-                  <CardContent className="pt-6 text-center">
-                    <Users className="w-12 h-12 mx-auto mb-3 text-blue-600" />
-                    <h3 className="font-bold mb-2">MultiSig Treasury</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      3-of-5 approval workflows for secure DAO funding
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      247 Proposals
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </Link>
-
-              <Link to="/yield-optimizer">
-                <Card className="hover:shadow-xl transition-all cursor-pointer bg-white border-2 hover:border-green-400">
-                  <CardContent className="pt-6 text-center">
-                    <Zap className="w-12 h-12 mx-auto mb-3 text-green-600" />
-                    <h3 className="font-bold mb-2">Yield Optimizer</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Earn 7-25% APY on escrowed funds
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      $760K TVL
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </Link>
-
-              <Link to="/analytics">
-                <Card className="hover:shadow-xl transition-all cursor-pointer bg-white border-2 hover:border-orange-400">
-                  <CardContent className="pt-6 text-center">
-                    <Brain className="w-12 h-12 mx-auto mb-3 text-orange-600" />
-                    <h3 className="font-bold mb-2">AI Analytics</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Risk scoring, fraud detection & predictions
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      94% Accuracy
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </Link>
+            
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary to-primary text-primary-foreground px-4 py-2 rounded-md font-bold">
+              <Trophy className="w-5 h-5" />
+              Chroma Awards 2025 Submission
             </div>
-
-            <div className="mt-6 text-center">
-              <Link to="/cross-chain-swap">
-                <Button className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-                  <Coins className="w-4 h-4 mr-2" />
-                  Explore Cross-Chain Swaps
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Technical Architecture Overview */}
-        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
+          </div>
+          
+          <div className="relative hidden md:block">
+            <div className="relative w-80 h-80 mx-auto">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-primary rounded-full animate-quaternion-rotate">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <Box className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <div>
-                  <h3 className="font-bold mb-2">AI Invoice Parsing</h3>
-                  <p className="text-sm text-muted-foreground">
-                    BERT-based NLP transforms plain-English invoices into structured JSON-LD with 95.2% F1 score
-                  </p>
+                <div className="absolute top-1/2 -right-4 -translate-y-1/2 w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-white" />
                 </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <Leaf className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <div>
-                  <h3 className="font-bold mb-2">Clarity Smart Contracts</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Formal verification ensures state transitions through created→funded→verified→released
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
-                    <Wallet className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">Bitcoin-Native Settlement</h3>
-                  <p className="text-sm text-muted-foreground">
-                    sBTC escrow eliminates counter-party risk with cryptographically enforced payment release
-                  </p>
+                <div className="absolute top-1/2 -left-4 -translate-y-1/2 w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-primary-foreground" />
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <button 
+          onClick={() => scrollToSection('overview')} 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce"
+        >
+          <ChevronDown className="w-8 h-8 text-primary" />
+        </button>
+      </section>
 
-        {/* Live Crypto Prices Banner */}
-        <Card className="mb-6 bg-gradient-to-r from-orange-50 to-purple-50 border-orange-200">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <TrendingUp className="w-8 h-8 text-orange-600" />
-                <div>
-                  <h3 className="text-lg font-bold mb-1">Live Market Prices</h3>
-                  <p className="text-sm text-muted-foreground">Real-time data from CoinGecko API</p>
-                </div>
-                <div className="flex gap-6 ml-8">
-                  {pricesLoading ? (
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">Loading...</span>
-                    </div>
-                  ) : (
-                    <>
-                      {prices.btc && (
-                        <div>
-                          <p className="text-xs text-gray-600">Bitcoin (BTC)</p>
-                          <p className="text-xl font-bold text-orange-600">
-                            {formatCurrency(prices.btc)}
-                          </p>
-                        </div>
-                      )}
-                      {prices.stx && (
-                        <div>
-                          <p className="text-xs text-gray-600">Stacks (STX)</p>
-                          <p className="text-xl font-bold text-purple-600">
-                            {formatCurrency(prices.stx)}
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={refetch}>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
-                <Link to="/api-demo">
-                  <Button variant="outline" size="sm">
-                    View API Demo
+      {/* Social Proof Section */}
+      <section className="py-12 bg-muted/20 border-y border-primary/20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="space-y-2 p-6 rounded-lg bg-card/50 border border-primary/20 hover:border-primary/40 transition-colors">
+              <div className="text-5xl mb-2">🏆</div>
+              <h4 className="text-xl font-bold text-primary">Chroma Awards 2025</h4>
+              <p className="text-muted-foreground">Official Submission</p>
+            </div>
+            <div className="space-y-2 p-6 rounded-lg bg-card/50 border border-primary/20 hover:border-primary/40 transition-colors">
+              <div className="text-5xl mb-2">⭐</div>
+              <h4 className="text-xl font-bold text-primary">AI Innovation</h4>
+              <p className="text-muted-foreground">Cutting-Edge Technology</p>
+            </div>
+            <div className="space-y-2 p-6 rounded-lg bg-card/50 border border-primary/20 hover:border-primary/40 transition-colors">
+              <div className="text-5xl mb-2">🎮</div>
+              <h4 className="text-xl font-bold text-primary">Instant Play</h4>
+              <p className="text-muted-foreground">No Registration Needed</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview Section */}
+      <section id="overview" className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-4 text-primary">Game Overview</h2>
+          <div className="w-24 h-1 bg-primary mx-auto mb-12 shadow-neon" />
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="animate-on-scroll opacity-0 translate-y-5 transition-all duration-700 bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon hover:-translate-y-2 group">
+              <CardContent className="p-6">
+                <Grid3x3 className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Procedural Strategy</h3>
+                <p className="text-muted-foreground">Every match features AI-generated maps, units, and commanders. No two games are alike with our neural terrain synthesis system.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="animate-on-scroll opacity-0 translate-y-5 transition-all duration-700 bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon hover:-translate-y-2 group" style={{ transitionDelay: '100ms' }}>
+              <CardContent className="p-6">
+                <Bot className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold mb-2 text-primary">AI-Driven Gameplay</h3>
+                <p className="text-muted-foreground">Command AI generals with unique personalities, each with their own strategic preferences and evolving tactics.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="animate-on-scroll opacity-0 translate-y-5 transition-all duration-700 bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon hover:-translate-y-2 group" style={{ transitionDelay: '200ms' }}>
+              <CardContent className="p-6">
+                <Brain className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Four-Dimensional Balance</h3>
+                <p className="text-muted-foreground">Master the Quaternion system: Matter, Energy, Life, and Knowledge. Each decision shifts the balance of power.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-muted/20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-4 text-primary">Innovative Features</h2>
+          <div className="w-24 h-1 bg-primary mx-auto mb-12 shadow-neon" />
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="animate-on-scroll opacity-0 translate-y-5 transition-all duration-700 bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <Dices className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Procedural Generation</h3>
+                <p className="text-muted-foreground">AI-powered terrain, unit, and narrative generation creates infinite replayability with Luma AI and Hailuo integration.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <Mic className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">AI Voice Narration</h3>
+                <p className="text-muted-foreground">Dynamic narration and character voices powered by ElevenLabs, with context-aware emotional responses.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <Palette className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">AI-Generated Art</h3>
+                <p className="text-muted-foreground">All visual assets created with OpenArt, Dreamina, and ArtCraft, ensuring a unique aesthetic for every playthrough.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <Music className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Adaptive Soundtrack</h3>
+                <p className="text-muted-foreground">Music and soundscape dynamically evolve based on gameplay using Fuser AI, matching the intensity of each moment.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <GitBranch className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Tech Tree Puzzles</h3>
+                <p className="text-muted-foreground">Strategic tech progression with optimal sequencing challenges. Each choice opens new tactical possibilities.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <CardContent className="p-6 relative">
+                <Mountain className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-primary">Terrain-Based Strategy</h3>
+                <p className="text-muted-foreground">Exploit procedurally generated terrain features like chokepoints, elevation, and dynamic environmental hazards.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Tools Section */}
+      <section id="ai-tools" className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-4 text-primary">AI Tools Integration</h2>
+          <div className="w-24 h-1 bg-primary mx-auto mb-6 shadow-neon" />
+          <p className="text-center text-muted-foreground max-w-3xl mx-auto mb-12">
+            Quaternion showcases cutting-edge AI creativity by integrating multiple AI tools throughout the development process and gameplay experience.
+          </p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {[
+              { name: "ElevenLabs", desc: "Voice Generation" },
+              { name: "OpenArt", desc: "Visual Assets" },
+              { name: "LTX Studio", desc: "Cinematics" },
+              { name: "Fuser", desc: "Adaptive Music" },
+              { name: "Luma AI", desc: "3D Generation" },
+              { name: "SAGA", desc: "Narrative Design" }
+            ].map((tool) => (
+              <Card key={tool.name} className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 text-center">
+                <CardContent className="p-6">
+                  <Brain className="w-10 h-10 text-primary mx-auto mb-2" />
+                  <h4 className="font-bold text-primary">{tool.name}</h4>
+                  <p className="text-sm text-muted-foreground">{tool.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Section */}
+      <section id="demo" className="py-20 bg-muted/20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-4 text-primary">Play The Demo</h2>
+          <div className="w-24 h-1 bg-primary mx-auto mb-12 shadow-neon" />
+          
+          <Card className="bg-card/70 border-primary shadow-neon overflow-hidden">
+            <CardContent className="p-8">
+              <div className="bg-background/50 h-96 rounded-lg flex items-center justify-center mb-8 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-shimmer" />
+                <div className="text-center z-10">
+                  <Gamepad2 className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold mb-2">WebGL Game Demo</h3>
+                  <p className="text-muted-foreground mb-4">Play directly in your browser - no downloads required</p>
+                  <Button 
+                    onClick={() => navigate('/game')}
+                    className="bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-neon"
+                  >
+                    Launch Game
                   </Button>
-                </Link>
+                </div>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <h4 className="font-bold mb-2 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-primary" />
+                    Chroma Awards Compliant
+                  </h4>
+                  <p className="text-sm text-muted-foreground">Playable in browser with no downloads or login required</p>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-primary" />
+                    15-30 Minute Experience
+                  </h4>
+                  <p className="text-sm text-muted-foreground">Perfect for judging with a complete gameplay loop</p>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2 flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-primary" />
+                    AI Features Showcase
+                  </h4>
+                  <p className="text-sm text-muted-foreground">Experience all the AI-generated content in action</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Characters Section */}
+      <section id="characters" className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-4 text-primary">AI Commanders</h2>
+          <div className="w-24 h-1 bg-primary mx-auto mb-12 shadow-neon" />
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden">
+              <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                <Box className="w-20 h-20 text-primary" />
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-primary mb-1">AUREN</h3>
+                <p className="text-secondary font-semibold mb-3">Architect of Matter</p>
+                <p className="text-sm text-muted-foreground">The rational industrialist focused on construction, efficiency, and resource optimization. Speaks in engineering metaphors.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden">
+              <div className="h-48 bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center">
+                <Zap className="w-20 h-20 text-secondary" />
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-primary mb-1">VIREL</h3>
+                <p className="text-secondary font-semibold mb-3">Keeper of Energy</p>
+                <p className="text-sm text-muted-foreground">Passionate and volatile, Virel controls power distribution and reacts emotionally to energy fluctuations.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden">
+              <div className="h-48 bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center">
+                <Leaf className="w-20 h-20 text-green-500" />
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-primary mb-1">LIRA</h3>
+                <p className="text-secondary font-semibold mb-3">Voice of Life</p>
+                <p className="text-sm text-muted-foreground">Empathic and nurturing, Lira oversees biomass and ecological balance, advocating for preservation over exploitation.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/70 border-primary/30 hover:border-primary hover:shadow-neon transition-all hover:-translate-y-2 overflow-hidden">
+              <div className="h-48 bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
+                <Brain className="w-20 h-20 text-accent" />
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-primary mb-1">KOR</h3>
+                <p className="text-secondary font-semibold mb-3">Seer of Knowledge</p>
+                <p className="text-sm text-muted-foreground">Detached and analytical, Kor manages research and data, speaking in probabilities and recursive logic.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-background/95 border-t border-primary/30 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="text-xl font-bold text-primary mb-4">QUATERNION: NEURAL FRONTIER</div>
+              <p className="text-sm text-muted-foreground mb-4">An AI-generated strategy experience for the Chroma Awards 2025</p>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary to-primary text-primary-foreground px-3 py-1 rounded text-sm font-bold">
+                <Trophy className="w-4 h-4" />
+                Official Submission
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Key Performance Metrics */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-center">Core Performance Metrics</h2>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="border-green-200 bg-green-50/50">
-            <CardHeader>
-              <Sparkles className="w-8 h-8 mb-2 text-green-600" />
-              <CardTitle>AI Accuracy</CardTitle>
-              <CardDescription>Key field extraction (F1 score)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-green-600">95.2%</p>
-              <p className="text-sm text-muted-foreground mt-1">40x improvement from 3.6%</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-blue-200 bg-blue-50/50">
-            <CardHeader>
-              <TrendingUp className="w-8 h-8 mb-2 text-blue-600" />
-              <CardTitle>Processing Time</CardTitle>
-              <CardDescription>Invoice → Smart Contract</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-blue-600">&lt;2s</p>
-              <p className="text-sm text-muted-foreground mt-1">99% latency reduction</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-purple-200 bg-purple-50/50">
-            <CardHeader>
-              <Wallet className="w-8 h-8 mb-2 text-purple-600" />
-              <CardTitle>Cost per Transaction</CardTitle>
-              <CardDescription>vs $15-20 manual processing</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-purple-600">$0.02</p>
-              <p className="text-sm text-muted-foreground mt-1">85% contribution margin</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-orange-200 bg-orange-50/50">
-            <CardHeader>
-              <Shield className="w-8 h-8 mb-2 text-orange-600" />
-              <CardTitle>Settlement Time</CardTitle>
-              <CardDescription>Bitcoin-native sBTC escrow</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-orange-600">Instant</p>
-              <p className="text-sm text-muted-foreground mt-1">From 14.6 day average</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Navigation */}
-        <QuickNav />
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
-            <CardDescription>AI-parsed invoices with Clarity smart contract escrow</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { 
-                  id: "2025-300", 
-                  status: "released", 
-                  amount: "0.85 sBTC", 
-                  usd: "$52,300",
-                  dao: "DeFi Protocol DAO",
-                  description: "Smart contract audit + security review",
-                  milestones: "3/3 verified"
-                },
-                { 
-                  id: "2025-299", 
-                  status: "funded", 
-                  amount: "0.42 sBTC", 
-                  usd: "$25,800",
-                  dao: "NFT Marketplace Collective",
-                  description: "Website redesign + mobile responsive",
-                  milestones: "2/3 verified"
-                },
-                { 
-                  id: "2025-298", 
-                  status: "verified", 
-                  amount: "0.65 sBTC", 
-                  usd: "$39,900",
-                  dao: "Web3 Education Guild",
-                  description: "Tutorial series + documentation",
-                  milestones: "Awaiting release"
-                },
-                { 
-                  id: "2025-297", 
-                  status: "created", 
-                  amount: "0.28 sBTC", 
-                  usd: "$17,200",
-                  dao: "Gaming DAO Treasury",
-                  description: "Token economics modeling",
-                  milestones: "Awaiting deposit"
-                },
-              ].map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <FileText className="w-6 h-6 text-muted-foreground" />
-                    <div>
-                      <p className="font-semibold">#{invoice.id}</p>
-                      <p className="text-sm text-muted-foreground">{invoice.dao}</p>
-                      <p className="text-xs text-muted-foreground">{invoice.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-semibold">{invoice.amount}</p>
-                      <p className="text-xs text-muted-foreground">{invoice.usd}</p>
-                      <p className="text-xs text-muted-foreground">{invoice.milestones}</p>
-                    </div>
-                    <Badge
-                      variant={
-                        invoice.status === "released"
-                          ? "default"
-                          : invoice.status === "verified"
-                          ? "default"
-                          : invoice.status === "funded"
-                          ? "secondary"
-                          : "outline"
-                      }
-                      className={
-                        invoice.status === "released"
-                          ? "bg-green-600"
-                          : invoice.status === "verified"
-                          ? "bg-blue-600"
-                          : invoice.status === "funded"
-                          ? "bg-purple-600"
-                          : ""
-                      }
-                    >
-                      {invoice.status}
-                    </Badge>
-                    <Link to={`/invoice/${invoice.id}`}>
-                      <Button size="sm">View</Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+            
+            <div>
+              <h4 className="font-bold mb-4">Quick Links</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#overview" className="block text-muted-foreground hover:text-primary transition-colors">Game Overview</a>
+                <a href="#features" className="block text-muted-foreground hover:text-primary transition-colors">Features</a>
+                <a href="#ai-tools" className="block text-muted-foreground hover:text-primary transition-colors">AI Tools</a>
+                <a href="#demo" className="block text-muted-foreground hover:text-primary transition-colors">Play Demo</a>
+                <a href="#characters" className="block text-muted-foreground hover:text-primary transition-colors">Characters</a>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            
+            <div>
+              <h4 className="font-bold mb-4">AI Tools Used</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">ElevenLabs</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">OpenArt</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">LTX Studio</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">Fuser</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">Luma AI</a>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-bold mb-4">Connect</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">Discord</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">Twitter</a>
+                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">YouTube</a>
+                <a href="https://chromaawards.devpost.com/" target="_blank" rel="noopener noreferrer" className="block text-muted-foreground hover:text-primary transition-colors">Chroma Awards</a>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-primary/20 pt-8 text-center text-sm text-muted-foreground">
+            <p className="mb-2">© 2025 Quaternion: Neural Frontier. Created for the Chroma Awards: AI Film, Music Videos, and Games competition.</p>
+            <p>This project uses AI-generated content created with proper licensing and permissions for all assets.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
