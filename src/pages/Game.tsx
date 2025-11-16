@@ -7,6 +7,7 @@ import { Minimap } from '@/components/game/Minimap';
 import { BuildQueue } from '@/components/game/BuildQueue';
 import { TechTreeModal } from '@/components/game/TechTreeModal';
 import { BuildMenu } from '@/components/game/BuildMenu';
+import { JudgeHUD } from '@/components/game/JudgeHUD';
 import { COMMANDERS, AI_SUGGESTIONS, BUILDINGS, TECH_TREE } from '@/data/gameData';
 import { toast } from 'sonner';
 
@@ -37,6 +38,12 @@ const Game = () => {
   const [buildQueue, setBuildQueue] = useState<any[]>([]);
   const [researchedTechs, setResearchedTechs] = useState<Set<string>>(new Set());
   const [aiMessages, setAiMessages] = useState<Array<{ commander: string; message: string; id: number }>>([]);
+  
+  // Game metadata for Judge HUD replay generation
+  const [gameSeed] = useState(Math.floor(Math.random() * 1000000));
+  const [commanderId] = useState('AUREN');
+  const [mapConfig] = useState({ type: 'Crystalline Plains', width: 40, height: 30 });
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -523,6 +530,14 @@ const Game = () => {
                 <h3 className="text-primary font-bold mb-3 text-sm uppercase tracking-wide">Tactical Map</h3>
                 <Minimap gameWidth={1200} gameHeight={700} playerUnits={[]} enemyUnits={[]} buildings={[]} />
               </div>
+
+              {/* Judge HUD - Replay Generation */}
+              <JudgeHUD
+                seed={gameSeed}
+                commanderId={commanderId}
+                mapConfig={mapConfig}
+                outcome={resources.ore > 500 ? "Winning" : "In Progress"}
+              />
 
               {/* AI Suggestions */}
               <div className="bg-game-panel/90 backdrop-blur-md border border-accent/30 rounded-lg p-4 shadow-game-panel">
