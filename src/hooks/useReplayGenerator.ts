@@ -1,6 +1,13 @@
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 
+// Analytics helper
+function trackEvent(event: string, data?: any) {
+  if (typeof window !== 'undefined' && (window as any).dataLayer) {
+    (window as any).dataLayer.push({ event, ...data });
+  }
+}
+
 interface ReplayMetadata {
   replayId: string;
   url: string;
@@ -85,6 +92,9 @@ export function useReplayGenerator() {
     setLoading(true);
     setError(null);
 
+    // Track analytics
+    trackEvent('replay:generate:start', { mode: params.mode || 'fast' });
+
     // Create a deterministic ID from params for caching
     const cacheId = `${params.seed}_${params.commanderId}_${params.mapConfig.type}`;
     
@@ -104,6 +114,7 @@ export function useReplayGenerator() {
     const timeoutId = setTimeout(() => {
       setError('Generation timeout - try fast mode');
       setLoading(false);
+      trackEvent('replay:generate:timeout', { mode: params.mode });
       toast({
         title: "Generation timeout",
         description: "Try using fast mode for quicker results.",
@@ -131,6 +142,7 @@ export function useReplayGenerator() {
       saveToCache(cacheId, data);
       
       setMetadata(data);
+      trackEvent('replay:generate:success', { replayId: data.replayId });
       toast({
         title: "Replay generated successfully",
         description: "Judge-ready replay artifact is ready for download.",
@@ -141,6 +153,7 @@ export function useReplayGenerator() {
       clearTimeout(timeoutId);
       const errorMsg = err.message || 'Failed to generate replay';
       setError(errorMsg);
+      trackEvent('replay:generate:fail', { error: errorMsg });
       toast({
         title: "Generation failed",
         description: errorMsg,
@@ -187,6 +200,8 @@ export function useReplayGenerator() {
   const downloadReplay = useCallback(async (replayId: string, url?: string) => {
     try {
       const downloadUrl = url || `/api/replay/${replayId}/download`;
+      
+      trackEvent('replay:download', { replayId });
       
       // Try direct download
       const link = document.createElement('a');
